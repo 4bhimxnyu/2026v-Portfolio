@@ -1,0 +1,67 @@
+.bar {
+  position: fixed;
+  inset: var(--space-2) 0 auto;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--gutter);
+  pointer-events: none;
+}
+
+.pill {
+  pointer-events: auto;
+  padding: 0.35rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  border: 1px solid var(--ink-line);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* Scoped overrides of the React Bits defaults for this layout */
+.pill :global(.gooey-nav-container nav ul) {
+  gap: 0.25rem;
+  padding: 0;
+  color: var(--paper);
+}
+
+.pill :global(.gooey-nav-container nav ul li a) {
+  text-decoration: none;
+  padding: 0.5em 1.1em;
+}
+
+.pill :global(.gooey-nav-container nav ul li.active),
+.pill :global(.gooey-nav-container .effect.text.active) {
+  color: var(--ink);
+}
+
+/*
+ * The goo effect sits on a black backing blended with `lighten`. A fixed
+ * header is an isolated group, so outside the pill there is nothing to blend
+ * with and the black shows. Keep the backing inside the pill and match the ink.
+ */
+.pill {
+  position: relative;
+}
+
+.pill :global(.gooey-nav-container .effect.filter::before) {
+  inset: -0.35rem;
+  border-radius: var(--radius-pill);
+}
+
+.pill :global(.gooey-nav-container nav ul li::after),
+.pill :global(.gooey-nav-container .effect.filter::after) {
+  background: var(--paper);
+}
+
+@media (max-width: 420px) {
+  .pill {
+    font-size: 0.875rem;
+  }
+
+  .pill :global(.gooey-nav-container nav ul li a) {
+    padding: 0.5em 0.8em;
+  }
+}

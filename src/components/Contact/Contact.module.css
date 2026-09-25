@@ -1,0 +1,132 @@
+.contact {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: var(--space-6) var(--gutter);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--step-4);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'wdth' 64;
+  margin-bottom: var(--space-5);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.composer {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.label {
+  font-weight: 600;
+}
+
+.field {
+  position: relative;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: 11rem;
+  resize: vertical;
+  padding: var(--space-2);
+  /* room for the sling button in the corner */
+  padding-right: 6.5rem;
+  font: inherit;
+  font-size: var(--step-1);
+  line-height: 1.45;
+  color: var(--paper);
+  background: var(--ink-raised);
+  border: 1px solid var(--ink-line);
+  border-radius: var(--radius-m);
+  transition: border-color var(--dur-fast) ease;
+}
+
+.textarea::placeholder {
+  color: var(--faint);
+}
+
+.textarea:focus-visible {
+  outline: none;
+  border-color: var(--cyan);
+}
+
+.textarea[aria-invalid='true'] {
+  border-color: var(--violet);
+}
+
+.launcher {
+  position: absolute;
+  right: 1.4rem;
+  bottom: 1.4rem;
+}
+
+.help {
+  font-size: var(--step--1);
+  color: var(--faint);
+}
+
+.status {
+  min-height: 1.6em;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+.status[data-type='error'] {
+  color: var(--violet);
+}
+
+.direct {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.or {
+  color: var(--muted);
+}
+
+.email {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 90;
+  overflow-wrap: anywhere;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.links a {
+  color: var(--muted);
+  text-underline-offset: 0.25em;
+}
+
+.links a:hover {
+  color: var(--paper);
+}
+
+@media (max-width: 800px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}

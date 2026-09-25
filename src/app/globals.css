@@ -1,0 +1,142 @@
+/*
+ * Two-ink system: the page is printed in the same ink and paper as the
+ * DitherVeil hero. Cyan and violet only ever appear as light — the cursor
+ * trail, focus rings, the 3D point field — never as flat fills.
+ */
+:root {
+  --ink: #120f17;
+  --ink-raised: #1b1722;
+  --ink-line: #2c2735;
+  --paper: #f4f1ea;
+  --muted: #a8a3b3;
+  --faint: #6f6a7a;
+  --cyan: #67e8f9;
+  --violet: #a78bfa;
+
+  --font-display: var(--font-anybody), 'Arial Narrow', sans-serif;
+  --font-body: var(--font-hanken), system-ui, sans-serif;
+
+  /* type scale: ratio ~1.333, display sizes fluid */
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.333rem;
+  --step-2: 1.777rem;
+  --step-3: clamp(2rem, 1.4rem + 2.6vw, 3.2rem);
+  --step-4: clamp(2.6rem, 1.2rem + 6vw, 6rem);
+  --step-hero: clamp(3.4rem, 0.8rem + 12.4vw, 15rem);
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --space-6: clamp(5rem, 3rem + 8vw, 10rem);
+  --gutter: clamp(1rem, 0.4rem + 3vw, 3rem);
+  --max: 88rem;
+
+  --radius-s: 4px;
+  --radius-m: 10px;
+  --radius-pill: 100vw;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-med: 420ms;
+  --dur-slow: 900ms;
+
+  /* GooeyNav particle palette */
+  --color-1: var(--paper);
+  --color-2: var(--cyan);
+  --color-3: var(--violet);
+  --color-4: #ffffff;
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+  border-radius: var(--radius-s);
+}
+
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  left: var(--space-2);
+  top: -4rem;
+  z-index: 100;
+  padding: var(--space-1) var(--space-2);
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--radius-s);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
