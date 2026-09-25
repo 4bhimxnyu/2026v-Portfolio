@@ -63,15 +63,30 @@ A roughly 4:5 portrait works best.
 
 ### The groove
 
-`src/lib/bass.js` is a small Web Audio rig: a synthesized plucked bass (saw
-through a resonant low-pass, plus a sine sub), a synthesized drum kit, and a
-swung 16th-note sequencer playing a two-bar E-minor funk line at 98 BPM. The
-fretboard (`src/components/Groove/`) strums visually when you sweep the cursor
-across it, plays notes on tap or click, and lights up each fretted note while
-the groove plays. Browsers only allow audio after a click or tap, so the site
-stays silent until the visitor presses something. Edit `BASSLINE` in `bass.js`
-to write your own line: each entry is `[step, string, fret, length, ghost?]`
-on a 32-step grid.
+The bass is **physically modelled**, not an oscillator. `src/lib/stringModel.js`
+simulates a plucked string (extended Karplus–Strong): a delay line one period
+long, excited with a finger-pluck shape, losing high harmonics and energy on
+every pass like a real string, with an all-pass filter for the fractional part
+of the period so every fret is exactly in tune (measured within 0.1 cent across
+all 84 notes, open to fret 20). `src/lib/bass.js` plays those notes through a
+small bass-amp chain, keeps one note per string (a new pluck chokes the last),
+and adds a synthesized drum kit and a swung 16th-note sequencer playing a
+two-bar E-minor funk line at 98 BPM.
+
+On the fretboard (`src/components/Groove/`):
+
+- **E / A / D / G** buttons play the open strings (E1, A1, D2, G2).
+- **Click or tap a fret** to play that exact note; the readout names it.
+- **Slide:** press a fret and drag along the same string; the ringing note
+  glides fret by fret (works with touch too: swipe sideways along a string).
+- **Strum:** hold and drag across the strings; hovering just makes them shimmer.
+- **Tilt to play** (phones and tablets): tilt right for E, left for A, up for D,
+  down for G. The angle you hold the phone at when you switch it on is centre;
+  tilt back towards centre between notes. iPhones ask for motion permission.
+
+Browsers only allow audio after a click or tap, so the site stays silent until
+the visitor presses something. Edit `BASSLINE` in `bass.js` to write your own
+line: each entry is `[step, string, fret, length, ghost?]` on a 32-step grid.
 
 ## Tech
 

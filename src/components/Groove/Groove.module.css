@@ -174,3 +174,18 @@
     width: 100%;
   }
 }
+
+.readout {
+  margin-top: var(--space-2);
+  min-height: 1.6em;
+  font-size: var(--step--1);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tiltHint {
+  width: 100%;
+  font-size: var(--step--1);
+  color: var(--cyan);
+  max-width: 34ch;
+}
