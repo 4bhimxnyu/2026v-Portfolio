@@ -23,7 +23,9 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^1.0.9",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.3.6"
+    "eslint-config-next": "^16.3.6",
+    "pdfjs-dist": "^6.3.289"
   }
 }

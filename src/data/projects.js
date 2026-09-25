@@ -10,8 +10,10 @@
 //   year,          e.g. '2025'
 //   description,   one or two sentences, in your own words
 //   technologies,  e.g. ['Next.js', 'PostgreSQL']
-//   image,         path in /public, e.g. '/work/mextropic.jpg'
+//   image,         path in /public, e.g. '/images/projects/mextropic.webp'
+//   imageAlt,      what the image shows, for screen readers
 //   link,          live project URL
+//   source,        source code URL
 //   caseStudy,     case study URL
 // }
 
@@ -24,7 +26,9 @@ const project = (slug, name, details = {}) => ({
   description: '',
   technologies: [],
   image: '',
+  imageAlt: '',
   link: '',
+  source: '',
   caseStudy: '',
   ...details,
 });
@@ -37,6 +41,10 @@ export const projects = [
     description:
       'The website for Mextropic AI, an AI drug-discovery data startup. Figma designs turned into responsive React components, backed by an Express API with REST endpoints for the data catalogue, campaign data and a rate-limited enquiry form.',
     technologies: ['React', 'Vite', 'Express', 'Vercel serverless functions', 'Figma'],
+    // Homepage screenshot of the live site, captured at 1440x900.
+    image: '/images/projects/mextropic.webp',
+    imageAlt: 'The Mextropic AI homepage: a dark hero reading "Experimental Biomedical Data at AI model speed" over a laboratory flask.',
+    link: 'https://www.mextropic.com/',
   }),
   project('bunkout', 'Bunkout', {
     category: 'Brand website',
@@ -45,10 +53,19 @@ export const projects = [
     description:
       'The Next.js website for Bunkout, a stays and hospitality brand with 52K+ Instagram followers, presenting property listings, room galleries and menus, plus an admin dashboard for managing listings and site content.',
     technologies: ['Next.js'],
-    link: 'https://bunkout.in',
+    // Homepage screenshot of the live site, captured at 1440x900.
+    image: '/images/projects/bunkout.webp',
+    imageAlt: 'The Bunkout homepage: "Find Your Unique Escape" over a tropical resort, with a stay search bar and category filters.',
+    link: 'https://bunkout.in/',
   }),
-  // Not on the resume yet: add details here when you have them.
-  project('docugenius', 'DocuGenius'),
+  // Details and repo from the resume. No live URL or images yet: add them here.
+  project('shaolin-baddie-adventure', 'Shaolin Baddie Adventure', {
+    category: 'Browser RPG',
+    description:
+      'A 12-map pixel-art RPG with turn-based battles, missions and save states, generating all art and music procedurally at runtime with Canvas and Web Audio.',
+    technologies: ['TypeScript', 'React 19', 'Phaser 3', 'Zustand', 'Tailwind'],
+    source: 'https://github.com/4bhimxnyu/Pixel-Art-Adventure-Game.',
+  }),
   project('altself', 'AltSelf', {
     category: 'Personal AI agent',
     role: 'UI design and web prototype',
@@ -74,13 +91,5 @@ export const otherProjects = [
       'An offline chatbot on Gemma 2B that runs on a consumer GPU (RTX 3050), using a custom Ollama Modelfile for its persona and document Q&A instructions, with no cloud APIs.',
     technologies: ['Python', 'Ollama', 'Gemma 2B'],
     link: 'https://github.com/4bhimxnyu/Nexus-Local-LLM',
-  },
-  {
-    name: 'Shaolin Baddie',
-    category: 'Browser RPG',
-    description:
-      'A 12-map pixel-art RPG with turn-based battles, missions and save states, generating all art and music procedurally at runtime with Canvas and Web Audio.',
-    technologies: ['TypeScript', 'React 19', 'Phaser 3', 'Zustand', 'Tailwind'],
-    link: 'https://github.com/4bhimxnyu/Pixel-Art-Adventure-Game.',
   },
 ];

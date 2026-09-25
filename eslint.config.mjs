@@ -10,10 +10,13 @@ const config = [
       'src/components/navigation/GooeyNav/**',
       'src/components/typography/SplitFlapText/**',
       'src/components/micro/SlingButton/**',
+      'src/components/micro/PaperCrumple/**',
+      'src/components/cards/ProfileCard/**',
     ],
     rules: {
       'react-hooks/refs': 'off',
       'react-hooks/set-state-in-effect': 'off',
+      '@next/next/no-img-element': 'off',
     },
   },
   { ignores: ['.next/**', 'node_modules/**'] },

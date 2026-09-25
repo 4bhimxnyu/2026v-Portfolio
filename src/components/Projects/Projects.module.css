@@ -271,6 +271,13 @@
   .meta {
     display: none;
   }
+
+  /* Long names (Shaolin Baddie Adventure) wrap instead of being cut off. */
+  .name {
+    white-space: normal;
+    overflow: visible;
+    text-wrap: balance;
+  }
 }
 
 /* Other projects: a quieter three-up list under the selected four. */
@@ -290,7 +297,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: var(--space-4);
   padding-top: var(--space-3);
 }

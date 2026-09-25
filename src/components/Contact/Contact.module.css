@@ -12,11 +12,44 @@
   margin-bottom: var(--space-5);
 }
 
+/* form + direct links | profile card */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 24rem);
   gap: var(--space-5);
   align-items: start;
+}
+
+.main {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+}
+
+.card {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  /* Room for the card's glow so it isn't clipped by the section edge. */
+  padding: var(--space-2);
+}
+
+/* Fit the React Bits card to this column and to the page type. */
+.card :global(.pc-card-wrapper) {
+  --card-radius: 22px;
+}
+
+/* Size from the column width (aspect ratio gives the height) instead of the
+   component's viewport-height default. */
+.card :global(.pc-card-wrapper),
+.card :global(.pc-card-shell) {
+  width: 100%;
+}
+
+.card :global(.pc-card) {
+  width: 100%;
+  height: auto;
+  max-height: none;
 }
 
 .composer {
@@ -120,9 +153,24 @@
   color: var(--paper);
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1000px) {
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .card :global(.pc-card-wrapper) {
+    width: min(22rem, 100%);
+  }
+}
+
+@media (max-width: 800px) {
+  .main {
     gap: var(--space-4);
   }
+}
+
+.card :global(.pc-contact-btn) {
+  white-space: nowrap;
+  font-family: inherit;
 }

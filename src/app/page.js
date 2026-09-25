@@ -6,6 +6,7 @@ import About from '@/components/About/About';
 import Experience from '@/components/Experience/Experience';
 import Projects from '@/components/Projects/Projects';
 import Skills from '@/components/Skills/Skills';
+import Resume from '@/components/Resume/Resume';
 import Contact from '@/components/Contact/Contact';
 import Footer from '@/components/Footer/Footer';
 import { site } from '@/config/site';
@@ -13,7 +14,9 @@ import { site } from '@/config/site';
 export default function Home() {
   // Checked at build time (and on every request in dev): the Resume button only
   // links to the PDF once public/resume.pdf actually exists.
-  const resumeAvailable = fs.existsSync(path.join(process.cwd(), 'public', site.resume));
+  const publicFile = file => fs.existsSync(path.join(process.cwd(), 'public', file));
+  const resumeAvailable = publicFile(site.resume);
+  const previewAvailable = publicFile(site.resumePreview);
 
   return (
     <>
@@ -27,6 +30,10 @@ export default function Home() {
         <Experience />
         <Projects />
         <Skills />
+        <Resume
+          resumeHref={resumeAvailable ? site.resume : null}
+          previewSrc={previewAvailable ? site.resumePreview : null}
+        />
         <Contact />
       </main>
       <Footer />

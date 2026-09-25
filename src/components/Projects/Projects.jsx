@@ -6,14 +6,14 @@ import { projects, otherProjects } from '@/data/projects';
 import styles from './Projects.module.css';
 
 function ProjectDetails({ project }) {
-  const { description, role, technologies, image, link, caseStudy, name } = project;
-  const hasContent = description || role || technologies.length || link || caseStudy;
+  const { description, role, technologies, image, imageAlt, link, source, caseStudy, name } = project;
+  const hasContent = description || role || technologies.length || link || source || caseStudy;
 
   return (
     <div className={styles.details}>
       <div className={styles.preview}>
         {image ? (
-          <Image src={image} alt={`${name} preview`} fill sizes="(max-width: 800px) 100vw, 40vw" />
+          <Image src={image} alt={imageAlt || `${name} preview`} fill sizes="(max-width: 800px) 100vw, 40vw" />
         ) : (
           <span className={styles.previewEmpty}>Preview image to come</span>
         )}
@@ -39,8 +39,15 @@ function ProjectDetails({ project }) {
             </dl>
             <div className={styles.links}>
               {link && (
-                <a href={link} target="_blank" rel="noreferrer">
+                <a href={link} target="_blank" rel="noopener noreferrer">
                   Visit {name}
+                  <span className="visually-hidden"> (opens in a new tab)</span>
+                </a>
+              )}
+              {source && (
+                <a href={source} target="_blank" rel="noopener noreferrer">
+                  View the source on GitHub
+                  <span className="visually-hidden"> (opens in a new tab)</span>
                 </a>
               )}
               {caseStudy && <a href={caseStudy}>Read the case study</a>}
