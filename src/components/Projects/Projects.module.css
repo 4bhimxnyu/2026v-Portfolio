@@ -14,10 +14,8 @@
 }
 
 .title {
-  font-family: var(--font-display);
   font-size: var(--step-3);
   font-weight: 700;
-  font-variation-settings: 'wdth' 80;
   line-height: 1;
 }
 
@@ -58,28 +56,99 @@
   outline-offset: -2px;
 }
 
-/* The one hover treatment: the name physically widens on its variable width axis. */
+/* The one hover treatment: the name gains weight on Urbanist's variable axis. */
 .name {
-  font-family: var(--font-display);
-  font-size: clamp(2.25rem, 1rem + 5.4vw, 6.5rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-variation-settings: 'wdth' 62;
+  font-size: clamp(2.5rem, 1rem + 6vw, 7rem);
+  font-weight: 250;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   transition:
-    font-variation-settings var(--dur-med) var(--ease-out),
+    font-weight var(--dur-med) var(--ease-out),
     color var(--dur-fast) ease;
 }
 
 .row:hover .name,
 .row:focus-visible .name,
 .item[data-open] .name {
-  font-variation-settings: 'wdth' 112;
+  font-weight: 750;
   color: var(--paper);
+}
+
+/* Alternate rows mirror, so the four names read as a composed spread. */
+.item[data-flip] .row {
+  grid-template-columns: auto auto minmax(0, 1fr);
+}
+
+/* Explicit columns, so rows without meta still land in the right place. */
+.name {
+  grid-column: 1;
+}
+
+.meta {
+  grid-column: 2;
+}
+
+.toggle {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.item[data-flip] .name {
+  grid-column: 3;
+  grid-row: 1;
+  text-align: right;
+}
+
+.item[data-flip] .meta {
+  grid-column: 2;
+}
+
+.item[data-flip] .toggle {
+  grid-column: 1;
+}
+
+.item[data-flip] .details {
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+}
+
+.item[data-flip] .preview {
+  order: 2;
+}
+
+.row {
+  position: relative;
+}
+
+.float {
+  position: absolute;
+  left: var(--px, 50%);
+  top: var(--py, 50%);
+  width: 18rem;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  transition:
+    opacity var(--dur-fast) ease,
+    transform var(--dur-med) var(--ease-out);
+  z-index: 2;
+}
+
+.float img {
+  object-fit: cover;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .item:not([data-open]) .row:hover .float {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .meta {
@@ -190,8 +259,13 @@
 }
 
 @media (max-width: 800px) {
-  .details {
+  .details,
+  .item[data-flip] .details {
     grid-template-columns: 1fr;
+  }
+
+  .item[data-flip] .preview {
+    order: 0;
   }
 
   .meta {

@@ -1,0 +1,195 @@
+.skills {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: var(--space-6) var(--gutter);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: var(--step-3);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.intro {
+  color: var(--muted);
+  max-width: 36ch;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr);
+  grid-template-areas: 'tabs field panel';
+  align-items: center;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--ink-line);
+}
+
+/* Category index: type-led, the active area gains weight and full contrast. */
+.tabs {
+  grid-area: tabs;
+  display: grid;
+  align-content: center;
+  gap: 0.15rem;
+}
+
+.tab {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0.45rem 0;
+  cursor: pointer;
+  font-size: var(--step-1);
+  font-weight: 350;
+  line-height: 1.2;
+  color: var(--faint);
+  transition:
+    color var(--dur-fast) ease,
+    font-weight var(--dur-med) var(--ease-out);
+}
+
+.tab:hover {
+  color: var(--muted);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--paper);
+  font-weight: 700;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 4px;
+}
+
+.count {
+  font-size: var(--step--1);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+}
+
+.field {
+  grid-area: field;
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+}
+
+.fallback {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--muted) 1.2px, transparent 1.8px) 0 0 / 14px 14px;
+  mask: radial-gradient(circle, #000 55%, transparent 72%);
+  opacity: 0.6;
+}
+
+.panel {
+  grid-area: panel;
+  display: grid;
+  align-content: center;
+  gap: var(--space-3);
+  min-height: 16rem;
+}
+
+.panel:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 8px;
+}
+
+.panelTitle {
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+/* The list answers the category change: items settle in one after another. */
+.items li {
+  font-size: var(--step-3);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  animation: item-in var(--dur-med) var(--ease-out) both;
+  animation-delay: calc(var(--i) * 60ms);
+}
+
+@keyframes item-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+}
+
+.empty {
+  font-size: var(--step-1);
+  color: var(--faint);
+  max-width: 18ch;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'tabs'
+      'field'
+      'panel';
+    gap: var(--space-3);
+  }
+
+  /* Categories become a swipeable row. */
+  .tabs {
+    display: flex;
+    gap: var(--space-3);
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    flex: none;
+    font-size: var(--step-0);
+  }
+
+  .count {
+    display: none;
+  }
+
+  .field {
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .panel {
+    min-height: 0;
+  }
+
+  .items li {
+    font-size: var(--step-2);
+  }
+}

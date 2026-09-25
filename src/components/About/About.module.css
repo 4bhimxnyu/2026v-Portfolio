@@ -10,12 +10,10 @@
 
 .title {
   grid-column: 1 / span 8;
-  font-family: var(--font-display);
   font-size: var(--step-4);
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: -0.015em;
-  font-variation-settings: 'wdth' 80;
   text-wrap: balance;
 }
 

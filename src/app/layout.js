@@ -1,17 +1,12 @@
-import { Anybody, Hanken_Grotesk } from 'next/font/google';
+import { Urbanist } from 'next/font/google';
+import GlobalCursor from '@/components/effects/GlobalCursor/GlobalCursor';
 import { site } from '@/config/site';
 import './globals.css';
 
-const anybody = Anybody({
+// One variable font file covers every weight used on the site.
+const urbanist = Urbanist({
   subsets: ['latin'],
-  axes: ['wdth'],
-  variable: '--font-anybody',
-  display: 'swap',
-});
-
-const hanken = Hanken_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-hanken',
+  variable: '--font-urbanist',
   display: 'swap',
 });
 
@@ -26,8 +21,11 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${anybody.variable} ${hanken.variable}`}>
-      <body>{children}</body>
+    <html lang="en" className={urbanist.variable}>
+      <body>
+        {children}
+        <GlobalCursor />
+      </body>
     </html>
   );
 }

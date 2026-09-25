@@ -1,16 +1,12 @@
 'use client';
 
 import DitherVeil from '@/components/effects/DitherVeil/DitherVeil';
-import GlowCursor from '@/components/effects/GlowCursor/GlowCursor';
-import { useFinePointer, useReducedMotion } from '@/hooks/useMediaQuery';
 import useWebGL from '@/hooks/useWebGL';
 import { site } from '@/config/site';
 import styles from './Hero.module.css';
 
 function Portrait() {
   const webgl2 = useWebGL(2);
-  const finePointer = useFinePointer();
-  const reduced = useReducedMotion();
 
   // Before hydration: keep the stage empty (ink) so nothing flashes.
   if (webgl2 === null) return null;
@@ -20,7 +16,8 @@ function Portrait() {
     return <img className={styles.fallback} src={site.heroImage} alt="" />;
   }
 
-  const veil = (
+  // The glow trail is now site-wide (see GlobalCursor), so the veil stands alone here.
+  return (
     <DitherVeil
       src={site.heroImage}
       fit="contain"
@@ -33,34 +30,6 @@ function Portrait() {
       linger={1}
     />
   );
-
-  // The glow trail is only meaningful with a hovering pointer and motion allowed.
-  if (!finePointer || reduced) return veil;
-
-  return (
-    <GlowCursor
-      className={styles.glow}
-      color="#67E8F9"
-      secondaryColor="#A78BFA"
-      trailLength={40}
-      trailWidth={8}
-      trailTaper={0.8}
-      followSpeed={0.16}
-      glowIntensity={1.9}
-      glowSpread={1.2}
-      hotspot={0.65}
-      brightness={1.25}
-      opacity={1}
-      pulseSpeed={1.1}
-      noiseStrength={0.035}
-      idleFade
-      idleTimeout={700}
-      fadeDuration={900}
-      blendMode="screen"
-    >
-      {veil}
-    </GlowCursor>
-  );
 }
 
 export default function Hero() {
@@ -71,12 +40,10 @@ export default function Hero() {
       </div>
 
       <div className={styles.copy}>
-        <h1 id="hero-title" className={styles.name}>
-          <span className={styles.line}>Abhimanyu</span>
-          <span className={styles.line}>Singh</span>
-        </h1>
-
-        <div className={styles.aside}>
+        <div className={styles.block}>
+          <h1 id="hero-title" className={styles.name}>
+            {site.name}
+          </h1>
           <p className={styles.role}>{site.role}</p>
           <p className={styles.statement}>{site.statement}</p>
           <a className={styles.cta} href="#work">

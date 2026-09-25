@@ -4,11 +4,14 @@
   z-index: 50;
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
   padding-inline: var(--gutter);
   pointer-events: none;
 }
 
 .pill {
+  position: relative;
   pointer-events: auto;
   padding: 0.35rem;
   border-radius: var(--radius-pill);
@@ -17,7 +20,7 @@
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Scoped overrides of the React Bits defaults for this layout */
@@ -40,12 +43,8 @@
 /*
  * The goo effect sits on a black backing blended with `lighten`. A fixed
  * header is an isolated group, so outside the pill there is nothing to blend
- * with and the black shows. Keep the backing inside the pill and match the ink.
+ * with and the black shows. Keep the backing inside the pill.
  */
-.pill {
-  position: relative;
-}
-
 .pill :global(.gooey-nav-container .effect.filter::before) {
   inset: -0.35rem;
   border-radius: var(--radius-pill);
@@ -56,12 +55,76 @@
   background: var(--paper);
 }
 
-@media (max-width: 420px) {
+/* Resume: an outlined pill, visibly a different kind of action from the section links. */
+.resume {
+  all: unset;
+  box-sizing: border-box;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 3.25rem;
+  padding: 0 1.25rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--paper);
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--paper);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) ease,
+    color var(--dur-fast) ease;
+}
+
+a.resume:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.resume[aria-disabled='true'] {
+  border-color: var(--ink-line);
+  color: var(--faint);
+  cursor: not-allowed;
+}
+
+.resume:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .bar {
+    gap: 0.35rem;
+    padding-inline: 0.5rem;
+  }
+
   .pill {
-    font-size: 0.875rem;
+    padding: 0.25rem;
+    font-size: 0.8125rem;
+  }
+
+  .pill :global(.gooey-nav-container nav ul) {
+    gap: 0;
   }
 
   .pill :global(.gooey-nav-container nav ul li a) {
-    padding: 0.5em 0.8em;
+    padding: 0.55em 0.6em;
+  }
+
+  .pill :global(.gooey-nav-container .effect.filter::before) {
+    inset: -0.25rem;
+  }
+
+  .resume {
+    height: 2.4rem;
+    padding: 0 0.7rem;
+    font-size: 0.8125rem;
+  }
+
+  .resume svg {
+    display: none;
   }
 }

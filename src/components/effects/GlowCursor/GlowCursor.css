@@ -21,3 +21,15 @@
   width: 100%;
   height: 100%;
 }
+
+/* Portfolio addition: global mode. The layer itself carries the blend mode so it
+   screens against the page (a fixed element is its own isolated group). */
+.glow-cursor--global {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 60;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}

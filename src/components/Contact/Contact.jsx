@@ -92,11 +92,12 @@ export default function Contact() {
           <a className={styles.email} href={`mailto:${site.email}`}>
             {site.email}
           </a>
-          <ul className={styles.links}>
+          <ul className={styles.links} aria-label="Profiles">
             {site.links.map(link => (
               <li key={link.label}>
-                <a href={link.href} target="_blank" rel="noreferrer">
+                <a href={link.href} target="_blank" rel="noopener noreferrer">
                   {link.label}
+                  <span className="visually-hidden"> (opens in a new tab)</span>
                 </a>
               </li>
             ))}

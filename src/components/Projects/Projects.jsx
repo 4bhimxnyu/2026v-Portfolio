@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { featuredProjects } from '@/data/projects';
+import { projects } from '@/data/projects';
 import styles from './Projects.module.css';
 
 function ProjectDetails({ project }) {
@@ -54,6 +54,13 @@ function ProjectDetails({ project }) {
   );
 }
 
+// Cursor-following preview (only rendered for projects that have an image).
+const trackPreview = e => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.style.setProperty('--px', `${e.clientX - rect.left}px`);
+  e.currentTarget.style.setProperty('--py', `${e.clientY - rect.top}px`);
+};
+
 export default function Projects() {
   const [open, setOpen] = useState(null);
 
@@ -63,16 +70,21 @@ export default function Projects() {
         <h2 id="work-title" className={styles.title}>
           Selected work
         </h2>
-        <p className={styles.intro}>A few projects across product design and development. Open one for details.</p>
+        <p className={styles.intro}>Four projects, chosen on purpose. Open one for details.</p>
       </header>
 
       <ul className={styles.list}>
-        {featuredProjects.map(project => {
+        {projects.map((project, index) => {
           const isOpen = open === project.slug;
           const panelId = `project-${project.slug}`;
           const meta = [project.category, project.year].filter(Boolean).join(', ');
           return (
-            <li key={project.slug} className={styles.item} data-open={isOpen || undefined}>
+            <li
+              key={project.slug}
+              className={styles.item}
+              data-open={isOpen || undefined}
+              data-flip={index % 2 === 1 || undefined}
+            >
               <h3 className={styles.itemHeading}>
                 <button
                   type="button"
@@ -80,10 +92,16 @@ export default function Projects() {
                   aria-expanded={isOpen}
                   aria-controls={panelId}
                   onClick={() => setOpen(isOpen ? null : project.slug)}
+                  onPointerMove={project.image ? trackPreview : undefined}
                 >
                   <span className={styles.name}>{project.name}</span>
                   {meta && <span className={styles.meta}>{meta}</span>}
                   <span className={styles.toggle} aria-hidden="true" />
+                  {project.image && (
+                    <span className={styles.float} aria-hidden="true">
+                      <Image src={project.image} alt="" fill sizes="18rem" />
+                    </span>
+                  )}
                 </button>
               </h3>
               <div id={panelId} className={styles.panel} hidden={!isOpen}>

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowUpRight01Icon } from '@hugeicons/core-free-icons';
 import GooeyNav from '@/components/navigation/GooeyNav/GooeyNav';
 import { useReducedMotion } from '@/hooks/useMediaQuery';
 import styles from './SiteNav.module.css';
@@ -9,6 +11,7 @@ const items = [
   { label: 'Home', href: '#home' },
   { label: 'About', href: '#about' },
   { label: 'Work', href: '#work' },
+  { label: 'Skills', href: '#skills' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -16,7 +19,28 @@ const items = [
 // intermediate sections doesn't bounce the gooey pill through each of them.
 const CLICK_LOCK_MS = 1100;
 
-export default function SiteNav() {
+function ResumeButton({ href }) {
+  // Placeholder until public/resume.pdf exists: still focusable and announced,
+  // but clearly not a working link.
+  if (!href) {
+    return (
+      <button type="button" className={styles.resume} aria-disabled="true" title="Resume coming soon">
+        Resume
+        <span className="visually-hidden"> (coming soon)</span>
+      </button>
+    );
+  }
+
+  return (
+    <a className={styles.resume} href={href} target="_blank" rel="noopener noreferrer">
+      Resume
+      <HugeiconsIcon icon={ArrowUpRight01Icon} size={16} strokeWidth={2} aria-hidden="true" />
+      <span className="visually-hidden"> (PDF, opens in a new tab)</span>
+    </a>
+  );
+}
+
+export default function SiteNav({ resumeHref = null }) {
   const [active, setActive] = useState(0);
   const lockUntil = useRef(0);
   const reduced = useReducedMotion();
@@ -57,6 +81,7 @@ export default function SiteNav() {
           colors={[1, 2, 3, 1, 2, 3, 1, 4]}
         />
       </div>
+      <ResumeButton href={resumeHref} />
     </header>
   );
 }

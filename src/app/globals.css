@@ -13,8 +13,7 @@
   --cyan: #67e8f9;
   --violet: #a78bfa;
 
-  --font-display: var(--font-anybody), 'Arial Narrow', sans-serif;
-  --font-body: var(--font-hanken), system-ui, sans-serif;
+  --font-sans: var(--font-urbanist), system-ui, sans-serif;
 
   /* type scale: ratio ~1.333, display sizes fluid */
   --step--1: 0.875rem;
@@ -64,11 +63,18 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
 body {
   margin: 0;
   background: var(--ink);
   color: var(--paper);
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: var(--step-0);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;

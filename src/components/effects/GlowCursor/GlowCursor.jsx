@@ -146,6 +146,9 @@ const GlowCursor = ({
   blendMode = 'screen',
   maxDevicePixelRatio = 1.5,
   enabled = true,
+  // Portfolio addition: render as a fixed, click-through viewport layer that
+  // tracks the pointer across the whole window instead of inside a container.
+  global = false,
   children,
   className = '',
   style,
@@ -262,6 +265,7 @@ const GlowCursor = ({
     };
 
     const updatePointer = event => {
+      if (global && event.pointerType === 'touch') return;
       const rect = container.getBoundingClientRect();
       const x = clamp(event.clientX - rect.left, 0, rect.width);
       const y = clamp(rect.height - (event.clientY - rect.top), 0, rect.height);
@@ -341,9 +345,12 @@ const GlowCursor = ({
       wake();
     });
     intersectionObserver.observe(container);
-    container.addEventListener('pointermove', updatePointer);
-    container.addEventListener('pointerenter', updatePointer);
-    container.addEventListener('pointerleave', onPointerLeave);
+    const moveTarget = global ? window : container;
+    const leaveTarget = global ? document.documentElement : container;
+    moveTarget.addEventListener('pointermove', updatePointer, { passive: true });
+    moveTarget.addEventListener('pointerenter', updatePointer, { passive: true });
+    leaveTarget.addEventListener('pointerleave', onPointerLeave);
+    if (global) window.addEventListener('blur', onPointerLeave);
     resize();
     raf = requestAnimationFrame(render);
 
@@ -352,16 +359,17 @@ const GlowCursor = ({
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
-      container.removeEventListener('pointermove', updatePointer);
-      container.removeEventListener('pointerenter', updatePointer);
-      container.removeEventListener('pointerleave', onPointerLeave);
+      moveTarget.removeEventListener('pointermove', updatePointer);
+      moveTarget.removeEventListener('pointerenter', updatePointer);
+      leaveTarget.removeEventListener('pointerleave', onPointerLeave);
+      window.removeEventListener('blur', onPointerLeave);
       mesh.geometry.remove();
       program.remove();
     };
-  }, [maxDevicePixelRatio]);
+  }, [maxDevicePixelRatio, global]);
 
   return (
-    <div ref={containerRef} className={`glow-cursor${className ? ` ${className}` : ''}`} style={style} {...rest}>
+    <div ref={containerRef} className={`glow-cursor${global ? ' glow-cursor--global' : ''}${className ? ` ${className}` : ''}`} style={style} {...rest}>
       <canvas ref={canvasRef} className="glow-cursor__canvas" style={{ mixBlendMode: blendMode }} aria-hidden="true" />
       {children && <div className="glow-cursor__content">{children}</div>}
     </div>

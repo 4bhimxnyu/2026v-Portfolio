@@ -17,11 +17,6 @@
   height: 100%;
 }
 
-/* Glow sits above the dither (React Bits paints it beneath children by default). */
-.glow :global(.glow-cursor__canvas) {
-  z-index: 2;
-}
-
 .fallback {
   display: block;
   object-fit: contain;
@@ -32,51 +27,55 @@
   position: relative;
   z-index: 2;
   align-self: end;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
-  align-items: end;
-  gap: var(--space-4);
   max-width: var(--max);
   width: 100%;
   margin-inline: auto;
-  padding: 18vh var(--gutter) var(--space-4);
+  padding: 18vh var(--gutter) var(--space-5);
   /* Lets the pointer fall through to the portrait; links re-enable it. */
   pointer-events: none;
-  background: linear-gradient(to top, var(--ink) 18%, color-mix(in srgb, var(--ink) 55%, transparent) 60%, transparent);
+  background: linear-gradient(to top, var(--ink) 12%, color-mix(in srgb, var(--ink) 45%, transparent) 55%, transparent);
+}
+
+/* Editorial block pinned to the left edge of the grid, not a centred headline. */
+.block {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  max-width: 34rem;
+  /* Readable over the brightest parts of the dithered portrait. */
+  text-shadow: 0 0 1.5rem var(--ink), 0 0 0.5rem var(--ink), 0 0 0.2rem var(--ink);
 }
 
 .name {
-  font-family: var(--font-display);
-  font-size: var(--step-hero);
-  font-weight: 800;
-  line-height: 0.82;
-  letter-spacing: -0.02em;
-  font-variation-settings: 'wdth' 64;
-  animation: name-in 1.2s var(--ease-out) both;
-}
-
-.line {
-  display: block;
-}
-
-.line + .line {
-  /* Surname steps in: the two lines read as one staggered block. */
-  padding-left: 0.62em;
+  font-size: clamp(2.5rem, 1.4rem + 3.6vw, 5rem);
+  font-weight: 650;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  animation: name-in 1.1s var(--ease-out) both;
 }
 
 @keyframes name-in {
   from {
-    font-variation-settings: 'wdth' 150;
+    font-weight: 200;
+    letter-spacing: 0;
     opacity: 0;
-    letter-spacing: -0.06em;
   }
 }
 
-.aside {
-  display: grid;
-  gap: var(--space-2);
-  padding-bottom: 0.4em;
-  animation: fade-in 0.8s 0.5s var(--ease-out) both;
+.role {
+  margin-top: calc(var(--space-1) * -1);
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--paper);
+  animation: fade-in 0.8s 0.4s var(--ease-out) both;
+}
+
+.statement {
+  color: color-mix(in srgb, var(--muted) 70%, var(--paper));
+  max-width: 34ch;
+  animation: fade-in 0.8s 0.55s var(--ease-out) both;
 }
 
 @keyframes fade-in {
@@ -85,25 +84,15 @@
   }
 }
 
-.role {
-  font-weight: 600;
-  color: var(--paper);
-}
-
-.statement {
-  color: var(--muted);
-  max-width: 32ch;
-}
-
 .cta {
   pointer-events: auto;
-  justify-self: start;
   margin-top: var(--space-1);
   padding: 0.7rem 1.2rem;
   border: 1px solid var(--paper);
   border-radius: var(--radius-pill);
   text-decoration: none;
   font-weight: 600;
+  animation: fade-in 0.8s 0.7s var(--ease-out) both;
   transition:
     background var(--dur-fast) ease,
     color var(--dur-fast) ease;
@@ -160,9 +149,8 @@
 
 @media (max-width: 800px) {
   .copy {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
     padding-top: 40vh;
+    padding-bottom: var(--space-4);
   }
 
   .hint {

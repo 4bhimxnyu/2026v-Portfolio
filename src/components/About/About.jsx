@@ -15,8 +15,8 @@ export default function About() {
 
       <div className={styles.body}>
         <p>
-          A lot of an interface gets lost between the design file and the browser. I try to close that gap by doing
-          both: shaping the product and the experience, then writing the frontend that carries it.
+          I build products end to end: the interface people use, the APIs and data behind it, and everything in
+          between. Having a designer&rsquo;s eye means less gets lost between the design file and the browser.
         </p>
         <p>
           Lately that means creative frontend work, like WebGL, motion and interfaces that respond to the person using
@@ -31,6 +31,7 @@ export default function About() {
           stagger={0.06}
           cycleDelay={2400}
           charset="alpha"
+          style={{ fontFamily: 'var(--font-sans)' }}
           flipsPerChar={8}
           tileColor="#1b1722"
           textColor="#f4f1ea"
