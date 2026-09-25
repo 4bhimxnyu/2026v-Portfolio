@@ -126,9 +126,9 @@
 
 /* The list answers the category change: items settle in one after another. */
 .items li {
-  font-size: var(--step-3);
+  font-size: var(--step-2);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.025em;
   animation: item-in var(--dur-med) var(--ease-out) both;
   animation-delay: calc(var(--i) * 60ms);
@@ -190,6 +190,6 @@
   }
 
   .items li {
-    font-size: var(--step-2);
+    font-size: var(--step-1);
   }
 }

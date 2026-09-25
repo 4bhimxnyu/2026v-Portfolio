@@ -1,0 +1,140 @@
+%-------------------------------------------------------------------------------
+% Abhimanyu Singh - Resume
+% Compiles in Overleaf with pdfLaTeX (default). Single column, ATS-friendly.
+%-------------------------------------------------------------------------------
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[left=0.5in,right=0.5in,top=0.4in,bottom=0.4in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+
+% Keep the PDF text layer clean for ATS parsers
+\usepackage{iftex}
+\ifPDFTeX
+  \input{glyphtounicode}
+  \pdfgentounicode=1
+\fi
+
+\definecolor{accent}{HTML}{1F3A5F}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{0pt}
+\raggedright
+
+% Section headings
+\titleformat{\section}{\color{accent}\large\bfseries\scshape}{}{0em}{}[\vspace{-7pt}\color{accent}\rule{\linewidth}{0.6pt}]
+\titlespacing*{\section}{0pt}{6pt}{4pt}
+
+% Bullet lists
+\setlist[itemize]{leftmargin=1.1em,itemsep=0.5pt,parsep=0pt,topsep=1pt,label=$\bullet$}
+
+% Entry: title | dates  /  subtitle | location
+\newcommand{\entry}[4]{%
+  \begin{tabularx}{\linewidth}{@{}X r@{}}
+    \textbf{#1} & #2 \\
+    \textit{#3} & \textit{#4} \\
+  \end{tabularx}\vspace{-3pt}}
+
+% Project: name + stack | links
+\newcommand{\project}[3]{%
+  \begin{tabularx}{\linewidth}{@{}X r@{}}
+    \textbf{#1} \textbar{} \textit{#2} & #3 \\
+  \end{tabularx}\vspace{-3pt}}
+
+\begin{document}
+
+%----------------------------------- HEADER -----------------------------------
+\begin{center}
+  {\LARGE\bfseries Abhimanyu Singh}\\[3pt]
+  Pune, India \textbar{}
+  +91 76518 29028 \textbar{}
+  \href{mailto:abhimanyupratapsingh30nov1106@gmail.com}{abhimanyupratapsingh30nov1106@gmail.com}\\[1pt]
+  \href{https://github.com/4bhimxnyu}{github.com/4bhimxnyu} \textbar{}
+  \href{https://www.linkedin.com/in/4bhimxnyu/}{linkedin.com/in/4bhimxnyu} \textbar{}
+  \href{https://abhimanyu-singh.netlify.app}{abhimanyu-singh.netlify.app}
+\end{center}
+\vspace{-6pt}
+
+%---------------------------------- EDUCATION ---------------------------------
+\section{Education}
+\entry{MIT Art, Design and Technology University}{Pune, India}
+      {B.Tech in Computer Science and Engineering}{Expected 2028}
+
+%---------------------------------- EXPERIENCE --------------------------------
+\section{Experience}
+
+\entry{Mextropic AI}{Sep 2026 -- Present}
+      {Full-Stack Developer Intern}{}
+\begin{itemize}
+  \item Built and deployed the company website for an AI drug-discovery data startup using React, Vite and an Express API running as a Vercel serverless function.
+  \item Developed REST endpoints for the data catalogue, campaign data and a rate-limited enquiry form, with request-size limits and CORS rules.
+  \item Turned Figma designs into responsive React components, and shipped a second minimalist design variant for stakeholder review.
+\end{itemize}
+
+\entry{SuprSchool}{Apr 2026 -- Aug 2026}
+      {Full-Stack Developer}{}
+\begin{itemize}
+  \item Shipped features and fixes for a teacher and student school app built with Expo (React Native) and a TypeScript Express API on Supabase (PostgreSQL), released to iOS through TestFlight.
+  \item Fixed real-time notification delivery end to end: repaired the Postgres-queue worker that crashed on its first message, built the realtime channel the client subscribed to, and routed events, assignments and diary posts to the right classes.
+  \item Wrote contract tests that check every client API call against the server's routes, catching two endpoints the backend never served; added request timeouts, cursor pagination and idempotency keys.
+  \item Reduced iOS releases to a single command with EAS Build/Submit profiles, and fixed keyboard avoidance, safe-area insets, pull-to-refresh and duplicate network fetches across tabs.
+\end{itemize}
+
+\entry{Bunkout}{Jan 2026 -- Mar 2026}
+      {Full-Stack Developer}{\href{https://bunkout.in}{bunkout.in}}
+\begin{itemize}
+  \item Built the Next.js website for Bunkout, a stays and hospitality brand with 52K+ Instagram followers, presenting property listings, room galleries and menus.
+  \item Designed an admin dashboard for managing listings and site content.
+\end{itemize}
+
+%----------------------------------- PROJECTS ---------------------------------
+\section{Projects}
+
+\project{Redis Weather App}{Node.js, Express, Redis, Docker, GitHub Actions}
+        {\href{https://github.com/4bhimxnyu/Redis-based-weather-app.}{GitHub}}
+\begin{itemize}
+  \item Built a forecast service that caches Open-Meteo API responses in Redis with a 10-minute TTL and falls back gracefully when Redis is down; containerized with Docker Compose and tested in GitHub Actions CI.
+\end{itemize}
+
+\project{Nexus -- Local LLM Chatbot}{Python, Ollama, Gemma 2B}
+        {\href{https://github.com/4bhimxnyu/Nexus-Local-LLM}{GitHub}}
+\begin{itemize}
+  \item Built an offline chatbot on Gemma 2B that runs on a consumer GPU (RTX 3050), using a custom Ollama Modelfile for its persona and document Q\&A instructions, with no cloud APIs.
+\end{itemize}
+
+\project{Shaolin Baddie -- Browser RPG}{TypeScript, React 19, Phaser 3, Zustand, Tailwind}
+        {\href{https://github.com/4bhimxnyu/Pixel-Art-Adventure-Game.}{GitHub}}
+\begin{itemize}
+  \item Built a 12-map pixel-art RPG with turn-based battles, missions and save states, generating all art and music procedurally at runtime with Canvas and Web Audio.
+\end{itemize}
+
+\project{AltSelf -- Personal AI Agent}{Figma, React}{}
+\begin{itemize}
+  \item Designed the mobile and onboarding UI and built the web prototype for a permission-gated personal AI agent that asks approval for each exact action.
+\end{itemize}
+
+%-------------------------------- TECHNICAL SKILLS ----------------------------
+\section{Technical Skills}
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+  \textbf{Languages:}~      & TypeScript, JavaScript, Python, Java, SQL, HTML, CSS \\
+  \textbf{Frontend:}~       & React, React Native, Expo, Next.js, Vite, Tailwind CSS, Zustand, TanStack Query \\
+  \textbf{Backend:}~        & Node.js, Express, REST APIs, Zod, JWT authentication \\
+  \textbf{Databases:}~      & PostgreSQL, Supabase, Redis, MongoDB, Drizzle ORM \\
+  \textbf{DevOps / Tools:}~ & Docker, GitHub Actions, Git, Vercel, Netlify, EAS, TestFlight, Vitest, Figma \\
+  \textbf{AI / ML:}~        & LLMs, Ollama, Claude Code (AI-assisted development) \\
+\end{tabularx}
+
+%--------------------------------- ACHIEVEMENTS -------------------------------
+\section{Achievements}
+\begin{itemize}
+  \item Runner-up, National Battle of Bands, CBIT.
+\end{itemize}
+
+\end{document}

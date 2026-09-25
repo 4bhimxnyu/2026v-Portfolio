@@ -272,3 +272,68 @@
     display: none;
   }
 }
+
+/* Other projects: a quieter three-up list under the selected four. */
+.other {
+  margin-top: var(--space-5);
+}
+
+.otherTitle {
+  font-size: var(--step-1);
+  font-weight: 700;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--ink-line);
+}
+
+.otherList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+}
+
+.otherItem {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+}
+
+.otherName {
+  font-size: var(--step-2);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.otherName a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--faint);
+}
+
+.otherName a:hover {
+  text-decoration-color: var(--violet);
+}
+
+.otherCategory {
+  color: var(--muted);
+}
+
+.otherDescription {
+  color: color-mix(in srgb, var(--muted) 60%, var(--paper));
+  max-width: 44ch;
+}
+
+.otherTech {
+  font-size: var(--step--1);
+  color: var(--faint);
+}
+
+@media (max-width: 900px) {
+  .otherList {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

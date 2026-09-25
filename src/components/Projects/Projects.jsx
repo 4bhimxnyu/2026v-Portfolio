@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { projects } from '@/data/projects';
+import { projects, otherProjects } from '@/data/projects';
 import styles from './Projects.module.css';
 
 function ProjectDetails({ project }) {
@@ -111,6 +111,31 @@ export default function Projects() {
           );
         })}
       </ul>
+
+      {otherProjects.length > 0 && (
+        <div className={styles.other}>
+          <h3 className={styles.otherTitle}>Other projects</h3>
+          <ul className={styles.otherList}>
+            {otherProjects.map(item => (
+              <li key={item.name} className={styles.otherItem}>
+                <h4 className={styles.otherName}>
+                  {item.link ? (
+                    <a href={item.link} target="_blank" rel="noopener noreferrer">
+                      {item.name}
+                      <span className="visually-hidden"> on GitHub (opens in a new tab)</span>
+                    </a>
+                  ) : (
+                    item.name
+                  )}
+                </h4>
+                {item.category && <p className={styles.otherCategory}>{item.category}</p>}
+                <p className={styles.otherDescription}>{item.description}</p>
+                <p className={styles.otherTech}>{item.technologies.join(', ')}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }

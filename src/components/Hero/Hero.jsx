@@ -41,7 +41,7 @@ export default function Hero() {
 
       <div className={styles.copy}>
         <div className={styles.block}>
-          <h1 id="hero-title" className={styles.name}>
+          <h1 id="hero-title" className={styles.name} data-text={site.name}>
             {site.name}
           </h1>
           <p className={styles.role}>{site.role}</p>

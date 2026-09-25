@@ -90,7 +90,9 @@ export default function Contact() {
         <div className={styles.direct}>
           <p className={styles.or}>Or write directly</p>
           <a className={styles.email} href={`mailto:${site.email}`}>
-            {site.email}
+            {/* Long address: allow a clean break before the @ on narrow screens. */}
+            {site.email.split('@')[0]}
+            <wbr />@{site.email.split('@')[1]}
           </a>
           <ul className={styles.links} aria-label="Profiles">
             {site.links.map(link => (

@@ -1,4 +1,5 @@
-// Skills, grouped by area. Add, remove, rename or reorder freely:
+// Skills, grouped by area, taken from the Technical Skills section of
+// Abhimanyu_Singh_Resume.pdf. Add, remove, rename or reorder freely:
 // - Order here is the order on the page (and the order the 3D field morphs through,
 //   from the round form for the first category to the lattice for the last).
 // - A category with no items shows a short "being added" note instead of a list.
@@ -7,27 +8,31 @@
 export const skills = [
   {
     category: 'Frontend Development',
-    // React and Next.js come from your original brief; add the rest.
-    items: ['React', 'Next.js'],
+    items: ['React', 'React Native', 'Expo', 'Next.js', 'Vite', 'Tailwind CSS', 'Zustand', 'TanStack Query'],
   },
   {
     category: 'Backend Development',
-    items: [],
+    items: ['Node.js', 'Express', 'REST APIs', 'Zod', 'JWT authentication'],
   },
   {
     category: 'Databases',
-    items: [],
+    items: ['PostgreSQL', 'Supabase', 'Redis', 'MongoDB', 'Drizzle ORM'],
   },
   {
+    // The resume groups these with tools; split here into infrastructure and tooling.
     category: 'DevOps & Infrastructure',
-    items: [],
+    items: ['Docker', 'GitHub Actions', 'Vercel', 'Netlify', 'EAS', 'TestFlight'],
   },
   {
     category: 'Programming Languages',
-    items: [],
+    items: ['TypeScript', 'JavaScript', 'Python', 'Java', 'SQL', 'HTML', 'CSS'],
   },
   {
     category: 'Tools & Technologies',
-    items: [],
+    items: ['Git', 'Vitest', 'Figma'],
+  },
+  {
+    category: 'AI & ML',
+    items: ['LLMs', 'Ollama', 'Claude Code (AI-assisted development)'],
   },
 ];

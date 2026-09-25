@@ -1,0 +1,108 @@
+.experience {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: var(--space-6) var(--gutter);
+}
+
+.title {
+  font-size: var(--step-3);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: var(--space-4);
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ink-line);
+}
+
+/* dates | company + role | what I did */
+.entry {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr) minmax(0, 1.5fr);
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--ink-line);
+}
+
+.dates {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: var(--step--1);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* The current role is lit, in the same cyan the cursor uses. */
+.live {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0.6rem var(--cyan);
+  transform: translateY(-0.05rem);
+}
+
+.who {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+}
+
+.company {
+  font-size: var(--step-2);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.company a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--faint);
+}
+
+.company a:hover {
+  text-decoration-color: var(--violet);
+}
+
+.role {
+  color: var(--muted);
+}
+
+.points {
+  margin: 0;
+  padding-left: 1.1em;
+  display: grid;
+  gap: var(--space-1);
+  max-width: 62ch;
+  color: color-mix(in srgb, var(--muted) 60%, var(--paper));
+}
+
+.points li::marker {
+  color: var(--faint);
+}
+
+.education {
+  margin-top: var(--space-5);
+}
+
+.subtitle {
+  font-size: var(--step-1);
+  font-weight: 700;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--ink-line);
+}
+
+@media (max-width: 900px) {
+  .entry {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+}

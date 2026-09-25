@@ -55,6 +55,42 @@
   animation: name-in 1.1s var(--ease-out) both;
 }
 
+/*
+ * Hover: the name takes on the portrait's iridescence. A gradient-clipped copy
+ * (from data-text) fades in over the solid text, since gradients can't transition.
+ */
+.name {
+  position: relative;
+  pointer-events: auto;
+  cursor: default;
+}
+
+.name::after {
+  content: attr(data-text);
+  /* Empty alt text: decorative copy, not read twice by screen readers. */
+  content: attr(data-text) / '';
+  position: absolute;
+  /* Extends below the tight line box so descenders (the g) get the gradient too. */
+  inset: 0 0 -0.3em;
+  background: linear-gradient(100deg, var(--cyan) 0%, var(--violet) 55%, var(--cyan) 100%);
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  opacity: 0;
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    background-position 1.2s var(--ease-out);
+  pointer-events: none;
+}
+
+.name:hover::after {
+  opacity: 1;
+  background-position: 0 0;
+}
+
 @keyframes name-in {
   from {
     font-weight: 200;

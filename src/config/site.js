@@ -7,15 +7,17 @@ export const site = {
   description:
     'Abhimanyu Singh is a full stack developer who builds products end to end, from the interface to the systems behind it.',
 
-  // TODO: replace with the address you want visitors to write to.
-  email: 'hello@example.com',
+  // From the resume header.
+  email: 'abhimanyupratapsingh30nov1106@gmail.com',
 
-  // Resume: drop the PDF at public/resume.pdf. Until that file exists the
-  // navbar shows a disabled "Resume soon" placeholder instead of a dead link.
-  resume: '/resume.pdf',
+  // Resume PDF. Edit the file in ./Resume; scripts/sync-resume.mjs copies it to
+  // this path before every dev/build. If ./Resume has no PDF, the navbar shows a
+  // disabled "Resume" placeholder instead of a dead link.
+  resume: '/resume/Abhimanyu_Singh_Resume.pdf',
 
   // Remove an entry to hide it everywhere it appears (Contact and Footer).
   links: [
+    { label: 'GitHub', href: 'https://github.com/4bhimxnyu' },
     { label: 'LinkedIn', href: 'https://www.linkedin.com/in/4bhimxnyu/' },
     { label: 'Behance', href: 'https://www.behance.net/abhimanyusingh92' },
   ],

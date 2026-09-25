@@ -9,3 +9,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Generated from ./Resume by scripts/sync-resume.mjs
+public/resume/
