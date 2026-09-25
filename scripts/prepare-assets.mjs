@@ -2,7 +2,8 @@
 // Runs before `dev` and `build`, locally and on Vercel. Output is git-ignored.
 //
 // 1. Profile photo: src/assets/avatar.(jpg|jpeg|png|webp) -> public/images/avatar.<ext>
-//    for the Contact profile card. No photo: the card shows initials.
+//    for the Contact profile card (no photo: the card shows initials), plus an
+//    optional square face crop, avatar-mini.*, for the small round avatar.
 // 2. Resume: the PDF in ./Resume -> public/resume/, under a fixed name so links
 //    never change, plus page 1 rendered to preview.webp for the resume pop-up.
 import fs from 'node:fs';
@@ -17,24 +18,29 @@ const RESUME_PDF = path.join(RESUME_OUT, 'Abhimanyu_Singh_Resume.pdf');
 const RESUME_PREVIEW = path.join(RESUME_OUT, 'preview.webp');
 const PREVIEW_WIDTH = 1000;
 
-function publishAvatar() {
-  for (const ext of AVATAR_EXTS) fs.rmSync(path.join('public', 'images', `avatar${ext}`), { force: true });
+function publishImage(base) {
+  for (const ext of AVATAR_EXTS) fs.rmSync(path.join('public', 'images', base + ext), { force: true });
 
   const file = fs.existsSync(AVATAR_DIR)
     ? fs.readdirSync(AVATAR_DIR).find(name => {
-        const { name: base, ext } = path.parse(name.toLowerCase());
-        return base === 'avatar' && AVATAR_EXTS.includes(ext);
+        const parsed = path.parse(name.toLowerCase());
+        return parsed.name === base && AVATAR_EXTS.includes(parsed.ext);
       })
     : null;
+  if (!file) return false;
 
-  if (!file) {
-    console.log('[avatar] No src/assets/avatar.(jpg|png|webp); the profile card shows initials.');
-    return;
-  }
-  const target = path.join('public', 'images', `avatar${path.extname(file).toLowerCase()}`);
+  const target = path.join('public', 'images', base + path.extname(file).toLowerCase());
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.copyFileSync(path.join(AVATAR_DIR, file), target);
   console.log(`[avatar] ${file} -> ${target}`);
+  return true;
+}
+
+function publishAvatar() {
+  if (!publishImage('avatar')) {
+    console.log('[avatar] No src/assets/avatar.(jpg|png|webp); the profile card shows initials.');
+  }
+  publishImage('avatar-mini');
 }
 
 async function renderPreview() {

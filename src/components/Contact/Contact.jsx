@@ -12,31 +12,94 @@ const buildMailto = message => {
   return `mailto:${site.email}?${params.toString().replace(/\+/g, '%20')}`;
 };
 
-export default function Contact({ avatarUrl = '' }) {
+// Web3Forms emails each submission to the inbox the access key was created
+// with. Keys are public by design (the form posts straight from the browser).
+// The env var, if set, wins over the value in site.js.
+const WEB3FORMS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || site.web3formsKey;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+async function sendViaWeb3Forms({ name, email, message }) {
+  const response = await fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      access_key: WEB3FORMS_KEY,
+      subject: `Portfolio message from ${name || email}`,
+      from_name: 'Portfolio contact form',
+      name: name || '(not given)',
+      email, // becomes Reply-To, so replying goes straight to the visitor
+      message,
+    }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.success) {
+    throw new Error(result.body?.message || result.message || `Request failed (${response.status})`);
+  }
+}
+
+export default function Contact({ avatarUrl = '', miniAvatarUrl = '' }) {
+  const direct = Boolean(WEB3FORMS_KEY);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState(null);
-  const fieldRef = useRef(null);
-  const fieldId = useId();
+  const [sending, setSending] = useState(false);
+  const messageRef = useRef(null);
+  const emailRef = useRef(null);
+  const honeypotRef = useRef(null);
+  const messageId = useId();
+  const nameId = useId();
+  const emailId = useId();
   const statusId = useId();
 
-  // The card's "Contact Me" button leads straight to the message box.
-  const focusMessage = () => {
-    fieldRef.current?.focus({ preventScroll: true });
-    fieldRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // The card's "Contact Me" button leads straight to the form.
+  const focusForm = () => {
+    const target = direct && !email ? emailRef.current : messageRef.current;
+    target?.focus({ preventScroll: true });
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
-  const openEmail = () => {
+  const fail = (text, field) => {
+    setStatus({ type: 'error', text, field });
+    (field === 'email' ? emailRef : messageRef).current?.focus();
+  };
+
+  const send = async () => {
+    if (sending) return;
     const text = message.trim();
-    if (!text) {
-      setStatus({ type: 'error', text: 'Write a message first, then launch it.' });
-      fieldRef.current?.focus();
+    if (!text) return fail('Write a message first, then launch it.', 'message');
+
+    // No key configured: hand the message to the visitor's email app.
+    if (!direct) {
+      window.location.href = buildMailto(text);
+      setStatus({
+        type: 'info',
+        text: 'Your email app should open with this message ready. It sends when you press send there.',
+      });
       return;
     }
-    window.location.href = buildMailto(text);
-    setStatus({
-      type: 'info',
-      text: 'Your email app should open with this message ready. It sends when you press send there.',
-    });
+
+    const address = email.trim();
+    if (!EMAIL_PATTERN.test(address)) return fail('Add your email address so I can write back.', 'email');
+
+    // Bots tick every box, including this hidden one. People never see it.
+    if (honeypotRef.current?.checked) return;
+
+    setSending(true);
+    setStatus({ type: 'info', text: 'Sending…' });
+    try {
+      await sendViaWeb3Forms({ name: name.trim(), email: address, message: text });
+      setStatus({ type: 'success', text: `Sent. Thanks! I'll reply to ${address}.` });
+      setMessage('');
+    } catch {
+      setStatus({ type: 'error', text: `That didn't send. Try again, or email me directly at ${site.email}.` });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const clearError = () => {
+    if (status?.type === 'error') setStatus(null);
   };
 
   return (
@@ -47,29 +110,75 @@ export default function Contact({ avatarUrl = '' }) {
 
       <div className={styles.grid}>
         <div className={styles.main}>
-          <div className={styles.composer}>
-            <label htmlFor={fieldId} className={styles.label}>
+          <form
+            className={styles.composer}
+            noValidate
+            onSubmit={e => {
+              e.preventDefault();
+              send();
+            }}
+          >
+            {direct && (
+              <div className={styles.row}>
+                <div className={styles.inputGroup}>
+                  <label htmlFor={nameId} className={styles.label}>
+                    Your name <span className={styles.optional}>(optional)</span>
+                  </label>
+                  <input
+                    id={nameId}
+                    className={styles.input}
+                    type="text"
+                    autoComplete="name"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                  />
+                </div>
+                <div className={styles.inputGroup}>
+                  <label htmlFor={emailId} className={styles.label}>
+                    Your email
+                  </label>
+                  <input
+                    id={emailId}
+                    ref={emailRef}
+                    className={styles.input}
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    aria-describedby={statusId}
+                    aria-invalid={status?.field === 'email' || undefined}
+                    onChange={e => {
+                      setEmail(e.target.value);
+                      clearError();
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <label htmlFor={messageId} className={styles.label}>
               Your message
             </label>
             <div className={styles.field}>
               <textarea
-                id={fieldId}
-                ref={fieldRef}
+                id={messageId}
+                ref={messageRef}
                 className={styles.textarea}
                 rows={4}
                 value={message}
                 placeholder="A project, a role, or just a hello."
                 aria-describedby={statusId}
-                aria-invalid={status?.type === 'error' || undefined}
+                aria-invalid={status?.field === 'message' || undefined}
                 onChange={e => {
                   setMessage(e.target.value);
-                  if (status?.type === 'error') setStatus(null);
+                  clearError();
                 }}
               />
               <div className={styles.launcher}>
                 <SlingButton
-                  onSend={openEmail}
-                  ariaLabel="Open this message in your email app"
+                  onSend={send}
+                  disabled={sending}
+                  ariaLabel={direct ? 'Send message' : 'Open this message in your email app'}
                   padColor="#f4f1ea"
                   iconColor="#120f17"
                   accentColor="#67E8F9"
@@ -89,11 +198,26 @@ export default function Contact({ avatarUrl = '' }) {
                 />
               </div>
             </div>
+
+            {/* Lets Enter in the name/email fields submit the form (a form with two
+                text inputs needs a submit button for that). The sling is the visible send. */}
+            <button type="submit" className="visually-hidden" tabIndex={-1} aria-hidden="true">
+              Send
+            </button>
+            <input
+              ref={honeypotRef}
+              type="checkbox"
+              name="botcheck"
+              className={styles.honeypot}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
             <p className={styles.help}>Tap the button, or pull it back and let go.</p>
             <p id={statusId} className={styles.status} data-type={status?.type} role="status">
               {status?.text}
             </p>
-          </div>
+          </form>
 
           <div className={styles.direct}>
             <p className={styles.or}>Or write directly</p>
@@ -123,10 +247,11 @@ export default function Contact({ avatarUrl = '' }) {
             status={site.status}
             contactText="Contact Me"
             avatarUrl={avatarUrl}
+            miniAvatarUrl={miniAvatarUrl || undefined}
             showUserInfo
             enableTilt
             enableMobileTilt={false}
-            onContactClick={focusMessage}
+            onContactClick={focusForm}
             iconUrl="/images/card-pattern.svg"
             behindGlowEnabled
             innerGradient="linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)"

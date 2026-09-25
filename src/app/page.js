@@ -14,8 +14,8 @@ import { site } from '@/config/site';
 // Files published by scripts/prepare-assets.mjs. Checked at build time (and on
 // every request in dev), so nothing links to a file that isn't there.
 const publicFile = file => fs.existsSync(path.join(process.cwd(), 'public', file));
-const findAvatar = () =>
-  site.avatar || ['jpg', 'jpeg', 'png', 'webp'].map(ext => `/images/avatar.${ext}`).find(publicFile) || '';
+const findImage = base =>
+  ['jpg', 'jpeg', 'png', 'webp'].map(ext => `/images/${base}.${ext}`).find(publicFile) || '';
 
 export default function Home() {
   const resumeHref = publicFile(site.resume) ? site.resume : null;
@@ -34,7 +34,7 @@ export default function Home() {
         <Projects />
         <Skills />
         <Groove />
-        <Contact avatarUrl={findAvatar()} />
+        <Contact avatarUrl={site.avatar || findImage('avatar')} miniAvatarUrl={findImage('avatar-mini')} />
       </main>
       <Footer />
     </>

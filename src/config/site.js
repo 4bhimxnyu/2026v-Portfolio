@@ -16,6 +16,13 @@ export const site = {
   // here only to override that. No photo: the card shows initials.
   avatar: '',
 
+  // Web3Forms access key: contact-form messages are emailed to the address the
+  // key was created with. Get one free at https://web3forms.com (enter your
+  // email; the key arrives in your inbox). Safe to commit: keys are public by
+  // design. Or set NEXT_PUBLIC_WEB3FORMS_KEY in Vercel instead.
+  // Empty = the form opens the visitor's own email app (mailto) instead.
+  web3formsKey: '9c8866e5-bdb9-49ba-b5fd-f0ea423d9aaf',
+
   // From the resume header.
   email: 'abhimanyupratapsingh30nov1106@gmail.com',
 
