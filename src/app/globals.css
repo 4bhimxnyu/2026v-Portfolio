@@ -63,6 +63,11 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* No page scroll behind an open modal (the resume pop-up). */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 button,
 input,
 textarea,

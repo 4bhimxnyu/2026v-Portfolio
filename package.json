@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "sync-resume": "node scripts/sync-resume.mjs",
-    "predev": "node scripts/sync-resume.mjs",
+    "prepare-assets": "node scripts/prepare-assets.mjs",
+    "predev": "node scripts/prepare-assets.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/sync-resume.mjs",
+    "prebuild": "node scripts/prepare-assets.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."

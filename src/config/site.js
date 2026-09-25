@@ -11,19 +11,21 @@ export const site = {
   // Shown on the Contact profile card. Kept factual (current role from the resume);
   // change it to e.g. 'Open to work' only if that is true.
   status: 'Intern at Mextropic AI',
-  // Profile photo for the Contact card, e.g. '/images/avatar.jpg'. Empty shows initials.
+  // Profile photo for the Contact card. Easiest: drop avatar.jpg/png/webp into
+  // src/assets/ and leave this empty; it is picked up automatically. Set a path
+  // here only to override that. No photo: the card shows initials.
   avatar: '',
 
   // From the resume header.
   email: 'abhimanyupratapsingh30nov1106@gmail.com',
 
-  // Resume PDF. Edit the file in ./Resume; scripts/sync-resume.mjs copies it to
+  // Resume PDF. Edit the file in ./Resume; scripts/prepare-assets.mjs copies it to
   // this path before every dev/build. If ./Resume has no PDF, the navbar shows a
   // disabled "Resume" placeholder instead of a dead link.
   // Same-origin path: in production this is
   // https://4bhimxnyu.vercel.app/resume/Abhimanyu_Singh_Resume.pdf
   resume: '/resume/Abhimanyu_Singh_Resume.pdf',
-  // Page 1 of the PDF, rendered by the same script, used by the Resume section.
+  // Page 1 of the PDF, rendered by the same script, used by the resume pop-up.
   resumePreview: '/resume/preview.webp',
 
   // Remove an entry to hide it everywhere it appears (Contact and Footer).

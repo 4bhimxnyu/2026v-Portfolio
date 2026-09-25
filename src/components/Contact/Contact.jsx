@@ -12,7 +12,7 @@ const buildMailto = message => {
   return `mailto:${site.email}?${params.toString().replace(/\+/g, '%20')}`;
 };
 
-export default function Contact() {
+export default function Contact({ avatarUrl = '' }) {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState(null);
   const fieldRef = useRef(null);
@@ -122,7 +122,7 @@ export default function Contact() {
             handle={site.handle}
             status={site.status}
             contactText="Contact Me"
-            avatarUrl={site.avatar}
+            avatarUrl={avatarUrl}
             showUserInfo
             enableTilt
             enableMobileTilt={false}
