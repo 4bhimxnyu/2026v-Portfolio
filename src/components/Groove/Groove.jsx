@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { STRINGS, GROOVE_INFO, createGroove, ensureAudio, noteFreq, pluck, slide } from '@/lib/bass';
+import { buzz } from '@/lib/haptics';
 import { noteName } from '@/lib/stringModel';
 import { useReducedMotion } from '@/hooks/useMediaQuery';
 import useInView from '@/hooks/useInView';
@@ -11,14 +12,22 @@ const LABEL_GUTTER = 44; // room on the left for the string buttons
 const STRING_WIDTHS = [1.4, 1.9, 2.5, 3.1]; // G D A E, thin to thick
 const INLAYS = [3, 5, 7, 9, 12, 15];
 const RETRIGGER_MS = 70;
-const TILT_TRIGGER = 22; // degrees from centre that play a note
-const TILT_REARM = 10; // back within this many degrees to play again
+const SHAKE_TRIGGER = 11; // m/s² of hand movement that counts as a shake
+const SHAKE_DOMINANCE = 1.5; // the shake axis must beat the other axis by this much
+const SHAKE_COOLDOWN_MS = 420; // swallows the stopping jolt that follows every shake
 
-// Tilt-to-play is offered on touch devices that expose orientation events.
+// Desktop: number keys play the open strings, low to high.
+const KEY_STRINGS = { 1: 'E', 2: 'A', 3: 'D', 4: 'G' };
+// Haptic "weight" per string: the low E gets the longest buzz.
+const BUZZ_MS = { E: 42, A: 34, D: 26, G: 20 };
+
+// Shake-to-play is offered on touch devices that expose motion events; the
+// keyboard shortcuts are for everything else.
 const noSubscribe = () => () => {};
-const tiltCapable = () =>
-  'DeviceOrientationEvent' in window && window.matchMedia('(pointer: coarse)').matches;
-const useTiltCapable = () => useSyncExternalStore(noSubscribe, tiltCapable, () => false);
+const isCoarse = () => window.matchMedia('(pointer: coarse)').matches;
+const shakeCapable = () => 'DeviceMotionEvent' in window && isCoarse();
+const useShakeCapable = () => useSyncExternalStore(noSubscribe, shakeCapable, () => false);
+const useHasKeyboard = () => useSyncExternalStore(noSubscribe, () => !isCoarse(), () => false);
 
 // Fret positions follow real bass geometry: fret n sits at L * (1 - 2^(-n/12))
 // from the nut, with the scale length stretched so ~15 frets fill the board.
@@ -132,8 +141,9 @@ export default function Groove() {
   const [soundOn, setSoundOn] = useState(false);
   const [lastNote, setLastNote] = useState(null);
   // 'off' | 'on' | 'denied' (permission refused) | 'nosensor' (no readings arrived)
-  const [tilt, setTilt] = useState('off');
-  const canTilt = useTiltCapable();
+  const [shake, setShake] = useState('off');
+  const canShake = useShakeCapable();
+  const hasKeyboard = useHasKeyboard();
 
   // Mutable animation state, kept out of React so drawing never re-renders.
   const sim = useRef({
@@ -197,76 +207,118 @@ export default function Groove() {
       sim.current.dots.push({ string: STRINGS[i].name, fret, ghost: false, born: performance.now() });
       wake();
       setLastNote({ string: STRINGS[i].name, fret, name: noteName(noteFreq(STRINGS[i].name, fret)) });
+      // Phones: feel the string. Thicker strings buzz longer.
+      buzz(BUZZ_MS[STRINGS[i].name]);
       return voice;
     },
     [strike, wake]
   );
 
-  // Tilt to play (phones): right E, left A, up D, down G. The angle the phone
-  // is held at when tilt is switched on counts as centre.
+  // Desktop: 1 2 3 4 play the open E A D G strings while the fretboard is on
+  // screen. Ignored while typing (the contact form) or with modifier keys.
   useEffect(() => {
-    if (tilt !== 'on' || !inView) return undefined;
-    let centre = null;
+    if (!inView || !hasKeyboard) return undefined;
+    const onKey = e => {
+      const name = KEY_STRINGS[e.key];
+      if (!name || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target;
+      if (t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      e.preventDefault();
+      playNote(STRINGS.findIndex(s => s.name === name), 0);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [inView, hasKeyboard, playNote]);
+
+  // Shake to play (phones): right E, left A, up D, down G, relative to the
+  // screen as the visitor sees it.
+  useEffect(() => {
+    if (shake !== 'on' || !inView) return undefined;
     let heard = false;
-    const armed = { x: true, y: true };
+    let quietUntil = 0;
+    // Some browsers report motion with the opposite sign to the spec. Gravity
+    // gives it away: held normally, a phone reads +y (upright) or +z (flat).
+    let sign = 0;
+    const calibration = [];
+    // Fallback when only accelerationIncludingGravity exists: subtract a slow
+    // running average (gravity) to leave the hand's movement.
+    const gravity = { x: 0, y: 0, primed: false };
     const stringIndex = name => STRINGS.findIndex(s => s.name === name);
 
-    const onOrientation = e => {
-      if (e.beta == null || e.gamma == null) return;
+    const onMotion = e => {
+      const g = e.accelerationIncludingGravity;
+      if (!g || g.x == null) return;
       heard = true;
-      // Map the sensor axes onto the screen as the visitor sees it.
-      const angle = (((screen.orientation?.angle ?? window.orientation ?? 0) % 360) + 360) % 360;
-      const [x, y] =
-        angle === 90 ? [e.beta, -e.gamma] : angle === 270 ? [-e.beta, e.gamma] : angle === 180 ? [-e.gamma, -e.beta] : [e.gamma, e.beta];
-      if (!centre) {
-        centre = { x, y };
+      if (!sign) {
+        calibration.push({ y: g.y, z: g.z });
+        if (calibration.length < 8) return;
+        const avg = k => calibration.reduce((sum, v) => sum + v[k], 0) / calibration.length;
+        const [y, z] = [avg('y'), avg('z')];
+        sign = (Math.abs(y) > Math.abs(z) ? y : z) < 0 ? -1 : 1;
         return;
       }
-      const dx = x - centre.x;
-      const dy = y - centre.y;
-      // Tilting back towards centre re-arms that axis, so one tilt = one note.
-      if (Math.abs(dx) < TILT_REARM) armed.x = true;
-      if (Math.abs(dy) < TILT_REARM) armed.y = true;
-      if (Math.abs(dx) >= TILT_TRIGGER && Math.abs(dx) > Math.abs(dy) && armed.x) {
-        armed.x = false;
-        playNote(stringIndex(dx > 0 ? 'E' : 'A'), 0);
-      } else if (Math.abs(dy) >= TILT_TRIGGER && Math.abs(dy) > Math.abs(dx) && armed.y) {
-        armed.y = false;
-        playNote(stringIndex(dy > 0 ? 'D' : 'G'), 0);
+      let ax;
+      let ay;
+      if (e.acceleration?.x != null) {
+        ax = e.acceleration.x;
+        ay = e.acceleration.y;
+      } else {
+        if (!gravity.primed) Object.assign(gravity, { x: g.x, y: g.y, primed: true });
+        gravity.x += 0.1 * (g.x - gravity.x);
+        gravity.y += 0.1 * (g.y - gravity.y);
+        ax = g.x - gravity.x;
+        ay = g.y - gravity.y;
       }
+      ax *= sign;
+      ay *= sign;
+      // Map the device axes onto the screen as the visitor sees it.
+      const angle = (((screen.orientation?.angle ?? window.orientation ?? 0) % 360) + 360) % 360;
+      const [x, y] = angle === 90 ? [-ay, ax] : angle === 270 ? [ay, -ax] : angle === 180 ? [-ax, -ay] : [ax, ay];
+
+      const now = performance.now();
+      if (now < quietUntil) return;
+      const [mx, my] = [Math.abs(x), Math.abs(y)];
+      let name = null;
+      if (mx >= SHAKE_TRIGGER && mx >= my * SHAKE_DOMINANCE) name = x > 0 ? 'E' : 'A';
+      else if (my >= SHAKE_TRIGGER && my >= mx * SHAKE_DOMINANCE) name = y > 0 ? 'D' : 'G';
+      if (!name) return;
+      quietUntil = now + SHAKE_COOLDOWN_MS;
+      playNote(stringIndex(name), 0);
     };
 
-    window.addEventListener('deviceorientation', onOrientation);
+    window.addEventListener('devicemotion', onMotion);
     const check = window.setTimeout(() => {
-      if (!heard) setTilt('nosensor');
+      if (!heard) setShake('nosensor');
     }, 2000);
     return () => {
-      window.removeEventListener('deviceorientation', onOrientation);
+      window.removeEventListener('devicemotion', onMotion);
       window.clearTimeout(check);
     };
-  }, [tilt, inView, playNote]);
+  }, [shake, inView, playNote]);
 
-  const toggleTilt = async () => {
-    if (tilt === 'on') {
-      setTilt('off');
+  const toggleShake = async () => {
+    if (shake === 'on') {
+      setShake('off');
+      buzz(10);
       return;
     }
     // Audio must start inside the tap itself, before any await.
     if (ensureAudio()) setSoundOn(true);
     // iPhone and iPad ask for motion permission, and only from a tap.
-    const Orientation = window.DeviceOrientationEvent;
-    if (typeof Orientation?.requestPermission === 'function') {
+    const Motion = window.DeviceMotionEvent;
+    if (typeof Motion?.requestPermission === 'function') {
       try {
-        if ((await Orientation.requestPermission()) !== 'granted') {
-          setTilt('denied');
+        if ((await Motion.requestPermission()) !== 'granted') {
+          setShake('denied');
           return;
         }
       } catch {
-        setTilt('denied');
+        setShake('denied');
         return;
       }
     }
-    setTilt('on');
+    setShake('on');
+    buzz([18, 60, 18]);
   };
 
   // Size the canvas to its box.
@@ -418,6 +470,7 @@ export default function Groove() {
           <p className={styles.intro}>
             Runner-up at the National Battle of Bands, CBIT. Click any fret to play that note, drag along a
             string to slide, drag across the strings to strum, or let the groove play.
+            {hasKeyboard && ' Keys 1 to 4 play the open E, A, D and G strings.'}
           </p>
         </div>
 
@@ -435,19 +488,19 @@ export default function Groove() {
           <button type="button" className={styles.sound} aria-pressed={soundOn} onClick={toggleSound}>
             {soundOn ? 'Sound on' : 'Sound off'}
           </button>
-          {canTilt && (
-            <button type="button" className={styles.sound} aria-pressed={tilt === 'on'} onClick={toggleTilt}>
-              {tilt === 'on' ? 'Tilt on' : 'Tilt to play'}
+          {canShake && (
+            <button type="button" className={styles.sound} aria-pressed={shake === 'on'} onClick={toggleShake}>
+              {shake === 'on' ? 'Shake on' : 'Shake to play'}
             </button>
           )}
           <p className={styles.meta}>
             {GROOVE_INFO.bpm} BPM, {GROOVE_INFO.key}
           </p>
-          {canTilt && tilt !== 'off' && (
+          {canShake && shake !== 'off' && (
             <p className={styles.tiltHint} role="status">
-              {tilt === 'on' && 'Tilt right for E, left for A, up for D, down for G. Tilt back to centre between notes.'}
-              {tilt === 'denied' && 'Motion access was blocked. Allow it in your browser settings to tilt to play.'}
-              {tilt === 'nosensor' && 'No motion sensor readings on this device. Tap the E, A, D and G letters instead.'}
+              {shake === 'on' && 'Give the phone a quick shake: right for E, left for A, up for D, down for G.'}
+              {shake === 'denied' && 'Motion access was blocked. Allow it in your browser settings to shake to play.'}
+              {shake === 'nosensor' && 'No motion sensor readings on this device. Tap the E, A, D and G letters instead.'}
             </p>
           )}
         </div>
@@ -476,9 +529,11 @@ export default function Groove() {
               className={styles.stringButton}
               style={{ top: `${20 + (60 * i) / (STRINGS.length - 1)}%` }}
               aria-label={`Play the open ${string.name} string`}
+              aria-keyshortcuts={hasKeyboard ? String(STRINGS.length - i) : undefined}
               onClick={() => playNote(i, 0)}
             >
               {string.name}
+              {hasKeyboard && <kbd className={styles.key}>{STRINGS.length - i}</kbd>}
             </button>
           ))}
         </div>
@@ -486,7 +541,9 @@ export default function Groove() {
       <p className={styles.readout} aria-live="polite">
         {lastNote
           ? `${lastNote.string} string, ${lastNote.slid ? 'slid to ' : ''}${lastNote.fret ? `fret ${lastNote.fret}` : 'open'}: ${lastNote.name}`
-          : 'Click a fret to play that note, or a letter for the open string.'}
+          : hasKeyboard
+            ? 'Click a fret to play that note, or press 1 to 4 for the open strings.'
+            : 'Tap a fret to play that note, or a letter for the open string.'}
       </p>
     </section>
   );

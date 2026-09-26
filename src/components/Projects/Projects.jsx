@@ -77,7 +77,7 @@ export default function Projects() {
         <h2 id="work-title" className={styles.title}>
           Selected work
         </h2>
-        <p className={styles.intro}>Four projects, chosen on purpose. Open one for details.</p>
+        <p className={styles.intro}>Three projects, chosen on purpose. Open one for details.</p>
       </header>
 
       <ul className={styles.list}>

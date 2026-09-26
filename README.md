@@ -55,7 +55,7 @@ A roughly 4:5 portrait works best.
 | Hero | DitherVeil portrait (hover to reveal, click for a ripple), name with an iridescent hover |
 | About | Includes a split-flap board: design, prototype, build, ship |
 | Experience | Timeline from `experience.js` |
-| Selected work | Four projects with screenshots, plus "Other projects" |
+| Selected work | Three projects with screenshots, plus "Other projects" |
 | Skills | Tabs per area; a three.js point field morphs for each |
 | Groove | Playable bass fretboard and a looping funk groove (Web Audio) |
 | Contact | Message box with a sling-shot send button, and a ProfileCard |
@@ -63,26 +63,33 @@ A roughly 4:5 portrait works best.
 
 ### The groove
 
-The bass is **physically modelled**, not an oscillator. `src/lib/stringModel.js`
-simulates a plucked string (extended Karplus–Strong): a delay line one period
-long, excited with a finger-pluck shape, losing high harmonics and energy on
-every pass like a real string, with an all-pass filter for the fractional part
-of the period so every fret is exactly in tune (measured within 0.1 cent across
-all 84 notes, open to fret 20). `src/lib/bass.js` plays those notes through a
-small bass-amp chain, keeps one note per string (a new pluck chokes the last),
+The bass is **physically modelled**, not an oscillator, and voiced as a 1979
+Fender Precision Bass. `src/lib/stringModel.js` simulates a plucked string
+(extended Karplus–Strong): a delay line one period long, excited with a
+fingertip-pluck shape, losing high harmonics and energy on every pass like a
+real string, with an all-pass filter for the fractional part of the period so
+every fret is exactly in tune (open to fret 20). It also models the P-bass
+split-coil pickup: its position along the string (E/A half and D/G half at
+slightly different spots) notches the harmonics that give a P its voice.
+`src/lib/bass.js` plays those notes through a valve-amp and 8x10-cab chain (low
+end, low-mid thump, upper-mid bark, pickup resonance, gentle valve drive),
+keeps one note per string (a new pluck chokes the last),
 and adds a synthesized drum kit and a swung 16th-note sequencer playing a
 two-bar E-minor funk line at 98 BPM.
 
 On the fretboard (`src/components/Groove/`):
 
 - **E / A / D / G** buttons play the open strings (E1, A1, D2, G2).
+- **Keys 1 / 2 / 3 / 4** (desktop) play the open E / A / D / G strings while
+  the fretboard is on screen (not while typing in the contact form).
 - **Click or tap a fret** to play that exact note; the readout names it.
 - **Slide:** press a fret and drag along the same string; the ringing note
   glides fret by fret (works with touch too: swipe sideways along a string).
 - **Strum:** hold and drag across the strings; hovering just makes them shimmer.
-- **Tilt to play** (phones and tablets): tilt right for E, left for A, up for D,
-  down for G. The angle you hold the phone at when you switch it on is centre;
-  tilt back towards centre between notes. iPhones ask for motion permission.
+- **Shake to play** (phones and tablets): a quick shake right plays E, left A,
+  up D, down G. iPhones ask for motion permission.
+- **Haptics** (phones): every note buzzes, longer for the thicker strings
+  (Vibration API on Android; the iOS 18+ switch-control haptic on iPhone).
 
 Browsers only allow audio after a click or tap, so the site stays silent until
 the visitor presses something. Edit `BASSLINE` in `bass.js` to write your own
@@ -112,6 +119,8 @@ src/
   data/                    projects, experience, skills
   hooks/                   media queries, in-view, WebGL detection
   lib/bass.js              Web Audio bass, drums and sequencer
+  lib/stringModel.js       physically modelled P-bass string and pickup
+  lib/haptics.js           phone vibration (Android) and iOS haptic tick
 public/images/             project screenshots, card pattern
 ```
 

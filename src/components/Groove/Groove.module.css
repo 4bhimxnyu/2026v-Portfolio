@@ -169,6 +169,18 @@
   color: var(--paper);
 }
 
+/* Keyboard shortcut (1-4), tucked into the letter's corner. */
+.key {
+  position: absolute;
+  top: -0.1rem;
+  right: -0.15rem;
+  font-family: inherit;
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--faint);
+}
+
 @media (max-width: 640px) {
   .controls {
     width: 100%;

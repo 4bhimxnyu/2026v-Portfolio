@@ -272,7 +272,7 @@
     display: none;
   }
 
-  /* Long names (Shaolin Baddie Adventure) wrap instead of being cut off. */
+  /* Long names wrap instead of being cut off. */
   .name {
     white-space: normal;
     overflow: visible;

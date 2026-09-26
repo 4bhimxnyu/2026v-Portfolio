@@ -46,10 +46,35 @@
   width: 100%;
 }
 
+/* 9:16, the photo's own shape, so the whole photo shows uncropped. */
 .card :global(.pc-card) {
   width: 100%;
   height: auto;
   max-height: none;
+  aspect-ratio: 9 / 16;
+}
+
+.card :global(.pc-avatar-content .avatar) {
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+/* Phones: Safari can drop a blended layer inside the card's 3D-transformed
+   stack, leaving the photo invisible. Touch devices get no pointer tilt
+   anyway, so paint the photo as a plain layer there. */
+@media (hover: none), (pointer: coarse) {
+  .card :global(.pc-avatar-content) {
+    mix-blend-mode: normal;
+    transform: none;
+    backface-visibility: visible;
+  }
+
+  .card :global(.pc-avatar-content .avatar) {
+    transform: translateX(-50%);
+    will-change: auto;
+    backface-visibility: visible;
+  }
 }
 
 .composer {

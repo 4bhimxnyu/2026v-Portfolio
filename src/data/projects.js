@@ -58,14 +58,6 @@ export const projects = [
     imageAlt: 'The Bunkout homepage: "Find Your Unique Escape" over a tropical resort, with a stay search bar and category filters.',
     link: 'https://bunkout.in/',
   }),
-  // Details and repo from the resume. No live URL or images yet: add them here.
-  project('shaolin-baddie-adventure', 'Shaolin Baddie Adventure', {
-    category: 'Browser RPG',
-    description:
-      'A 12-map pixel-art RPG with turn-based battles, missions and save states, generating all art and music procedurally at runtime with Canvas and Web Audio.',
-    technologies: ['TypeScript', 'React 19', 'Phaser 3', 'Zustand', 'Tailwind'],
-    source: 'https://github.com/4bhimxnyu/Pixel-Art-Adventure-Game.',
-  }),
   project('altself', 'AltSelf', {
     category: 'Personal AI agent',
     role: 'UI design and web prototype',

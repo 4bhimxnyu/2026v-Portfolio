@@ -1,5 +1,6 @@
-// A tiny Web Audio bass rig: a physically modelled bass string (see
-// stringModel.js), a light drum kit and a swung 16th-note sequencer.
+// A tiny Web Audio bass rig: a physically modelled 1979 Fender Precision Bass
+// (see stringModel.js) through a valve amp, a light drum kit and a swung
+// 16th-note sequencer.
 // Browser only; nothing here runs on the server.
 //
 // Browsers only allow audio after a user gesture (click, tap, key), so the
@@ -11,32 +12,50 @@ let master = null;
 let amp = null;
 let noise = null;
 
-// Bass "amp": a bit of low-end warmth, a mid growl so notes read on laptop
-// speakers, a gentle top roll-off, and light saturation for body.
+// Rig: a '79 Precision Bass (passive split-coil, tone knob a touch rolled
+// off) into a valve bass head and an 8x10 cab. The string model supplies the
+// pickup's comb filtering; this chain supplies the rest of the P-bass voice:
+// a firm low end, the low-mid "thump", the upper-mid bark that cuts through a
+// band, the loaded pickup's resonance, and a cab that stops dead above ~5 kHz.
 function buildAmp(c) {
   const input = c.createGain();
-  const warmth = c.createBiquadFilter();
-  warmth.type = 'lowshelf';
-  warmth.frequency.value = 100;
-  warmth.gain.value = 3;
-  const growl = c.createBiquadFilter();
-  growl.type = 'peaking';
-  growl.frequency.value = 800;
-  growl.Q.value = 0.9;
-  growl.gain.value = 4;
-  const tone = c.createBiquadFilter();
-  tone.type = 'lowpass';
-  tone.frequency.value = 3800;
-  tone.Q.value = 0.5;
+  const eq = (type, frequency, gain = 0, Q = 0.7) => {
+    const f = c.createBiquadFilter();
+    f.type = type;
+    f.frequency.value = frequency;
+    f.Q.value = Q;
+    f.gain.value = gain;
+    return f;
+  };
+  const chain = [
+    eq('highpass', 32, 0, 0.6), // cab and head don't reproduce sub-rumble
+    eq('lowshelf', 90, 3.5), // valve-amp bottom
+    eq('peaking', 180, 2.5, 0.9), // P-bass thump
+    eq('peaking', 450, -2, 1.1), // scoop the boxiness between thump and bark
+    eq('peaking', 850, 4.5, 1.2), // the bark / growl
+    eq('peaking', 2400, 2.5, 2.2), // passive pickup resonance with the cable load
+    eq('lowpass', 3600, 0, 0.6), // tone knob at about 7
+  ];
+  // Valve drive: asymmetric soft clipping, so even harmonics warm the note.
   const drive = c.createWaveShaper();
-  const curve = new Float32Array(1024);
+  const curve = new Float32Array(2048);
+  const k = 2.2;
+  const bias = 0.18;
+  const norm = Math.tanh(k * (1 + bias)) - Math.tanh(k * bias);
   for (let i = 0; i < curve.length; i++) {
     const x = (i / (curve.length - 1)) * 2 - 1;
-    curve[i] = Math.tanh(1.6 * x) / Math.tanh(1.6);
+    curve[i] = (Math.tanh(k * (x + bias)) - Math.tanh(k * bias)) / norm;
   }
   drive.curve = curve;
-  drive.oversample = '2x';
-  input.connect(warmth).connect(growl).connect(tone).connect(drive).connect(master);
+  drive.oversample = '4x';
+  // The clipper's bias adds DC; block it, then let the 8x10 roll off the fizz.
+  const dcBlock = eq('highpass', 20, 0, 0.7);
+  const cab = eq('lowpass', 4800, 0, 0.9);
+  const cabNotch = eq('peaking', 1600, -1.5, 1.4);
+
+  let node = input;
+  for (const f of chain) node = node.connect(f);
+  node.connect(drive).connect(dcBlock).connect(cabNotch).connect(cab).connect(master);
   return input;
 }
 
@@ -69,18 +88,27 @@ export const STRINGS = [
 const OPEN = Object.fromEntries(STRINGS.map(s => [s.name, s.freq]));
 export const noteFreq = (string, fret) => OPEN[string] * 2 ** (fret / 12);
 
+// Split-coil P pickup, as a fraction of the 34" scale from the bridge: the E/A
+// half sits a little further up the neck than the D/G half.
+const PICKUP = { E: 0.2, A: 0.2, D: 0.18, G: 0.18 };
+
 // Rendered notes are cached per pitch and pluck style (a few ms each to make).
 const cache = new Map();
 const CACHE_LIMIT = 48;
-function noteBuffer(freq, velocity, muted) {
+function noteBuffer(freq, velocity, muted, string) {
   const level = muted ? 0 : velocity > 0.75 ? 2 : velocity > 0.45 ? 1 : 0;
-  const key = `${freq.toFixed(3)}|${level}|${muted ? 1 : 0}`;
+  // Which string it's on matters: the pickup sits at a different point along
+  // a fretted string than along an open one.
+  const open = string ? OPEN[string] : freq;
+  const pickup = (PICKUP[string] ?? 0.19) * (freq / open);
+  const key = `${freq.toFixed(3)}|${pickup.toFixed(3)}|${level}|${muted ? 1 : 0}`;
   let buffer = cache.get(key);
   if (!buffer) {
     const samples = renderString(freq, ctx.sampleRate, {
       duration: muted ? 0.25 : 3,
       velocity: [0.55, 0.75, 0.95][level],
-      pluckPoint: muted ? 0.12 : 0.22,
+      pluckPoint: muted ? 0.12 : 0.25,
+      pickup,
       muted,
     });
     buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
@@ -112,7 +140,7 @@ export function pluck(freq, { time, velocity = 0.85, length, ghost = false, stri
   const t = Math.max(time ?? c.currentTime, c.currentTime);
 
   const source = c.createBufferSource();
-  source.buffer = noteBuffer(freq, velocity, ghost);
+  source.buffer = noteBuffer(freq, velocity, ghost, string);
   const gain = c.createGain();
   const level = ghost ? 0.35 : 0.9 * (0.6 + 0.4 * velocity);
   gain.gain.setValueAtTime(level, t);
